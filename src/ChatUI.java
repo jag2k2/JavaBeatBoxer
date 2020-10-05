@@ -5,26 +5,27 @@ import java.awt.event.*;
 import java.util.ArrayList;
 
 public class ChatUI {
+    private final ServerCommunication serverCommunication;
     private final BeatPatternConverter beatPatternConverter;
+    private final ArrayList<ArrayList<Boolean>> patternStore;
+    private final MusicPlayer musicPlayer;
     private final JTextField comment;
     private final DefaultListModel<String> discussionElements;
     private final JList<String> discussion;
-    private final ArrayList<ArrayList<Boolean>> patternStore;
-    private final ServerCommunication serverCommunication;
     private final JScrollPane dScroller;
     private final JPanel commentPane;
 
-
-    public ChatUI(ArrayList<JCheckBox> userPatternSelection) {
+    public ChatUI(ArrayList<JCheckBox> userPatternSelection, MusicPlayer musicPlayer) {
         serverCommunication = new ServerCommunication(userPatternSelection);
         beatPatternConverter = new BeatPatternConverter(userPatternSelection);
-        patternStore = new ArrayList<>();
+        this.patternStore = new ArrayList<>();
+        this.musicPlayer = musicPlayer;
 
         comment = new JTextField("Your comment", 20);
 
         discussionElements = new DefaultListModel<>();
         discussion = new JList<>(discussionElements);
-        discussion.addListSelectionListener(new MySelectionListener());
+        discussion.addListSelectionListener(new UserMakesSelectionListener());
 
         dScroller = new JScrollPane(discussion);
         dScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
@@ -32,7 +33,7 @@ public class ChatUI {
         dScroller.setPreferredSize(new Dimension(50, -1));
 
         JButton sendComment = new JButton("Send");
-        sendComment.addActionListener(new MySendListener());
+        sendComment.addActionListener(new UserMakesCommentListener());
 
         BorderLayout commentLayout = new BorderLayout();
         commentPane = new JPanel(commentLayout);
@@ -48,24 +49,25 @@ public class ChatUI {
         return commentPane;
     }
 
-    public void startReaderThread() {
-        Thread readerThread = new Thread(new IncomingReader());
-        readerThread.start();
-    }
-
-    public class MySendListener implements ActionListener {
+    public class UserMakesCommentListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             serverCommunication.sendCurrentPatternWithComment(comment.getText());
         }
     }
 
-    public class MySelectionListener implements ListSelectionListener {
+    public class UserMakesSelectionListener implements ListSelectionListener {
         public void valueChanged(ListSelectionEvent e) {
             if (e.getValueIsAdjusting()) {
+                musicPlayer.stop();
                 System.out.println(discussion.getSelectedIndex());
                 beatPatternConverter.displayBeatPattern(patternStore.get(discussion.getSelectedIndex()));
             }
         }
+    }
+
+    public void startReaderThread() {
+        Thread readerThread = new Thread(new IncomingReader());
+        readerThread.start();
     }
 
     public class IncomingReader implements Runnable {

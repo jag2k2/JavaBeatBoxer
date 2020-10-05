@@ -4,35 +4,36 @@ import java.util.*;
 
 public class BeatBox {
 
-    private static final String[] instrumentNames = {"Bass Drum", "Closed Hi-Hat", "Open Hi-Hat", "Acoustic Snare", "Crash Cymbal",
-            "Hand Clap", "High Tom", "Hi Bongo", "Maracas", "Whistle", "Low Conga", "Cowbell", "Vibraslap",
-            "Low-mid Tom", "High Agogo", "Open Hi Conga"};
-
-    private final ArrayList<JCheckBox> checkboxList;
-    private final MusicPlayer musicPlayer;
-
     public static void main(String[] args) {
         BeatBox beatBox = new BeatBox();
         beatBox.buildGUI();
     }
 
-    public BeatBox() {
-        checkboxList = new ArrayList<>();
-        musicPlayer = new MusicPlayer();
-    }
-
     public void buildGUI() {
-        Box nameBox = new Box(BoxLayout.Y_AXIS);
+        ArrayList<JCheckBox> checkboxList = new ArrayList<>();
+        MusicPlayer musicPlayer = new MusicPlayer();
+
+        MusicPlayerControlUI musicPlayerControlUI = new MusicPlayerControlUI(checkboxList, musicPlayer);
+        FileStorageUI fileStorageUI = new FileStorageUI(checkboxList, musicPlayer);
 
         BorderLayout backgroundLayout = new BorderLayout();
         JPanel backgroundPane = new JPanel(backgroundLayout);
 
         GridLayout grid = new GridLayout(16, 16);
-        JPanel mainPanel = new JPanel(grid);
-        MusicPlayerControlUI musicPlayerControlUI = new MusicPlayerControlUI(checkboxList, musicPlayer);
-        FileStorageUI fileStorageUI = new FileStorageUI(checkboxList);
+        grid.setVgap(1);
+        grid.setHgap(2);
 
-        ChatUI chatUI = new ChatUI(checkboxList);
+        JPanel mainPanel = new JPanel(grid);
+        for (int i = 0; i< 256; i++){
+            JCheckBox c = new JCheckBox();
+            c.setSelected(false);
+            checkboxList.add(c);
+            mainPanel.add(c);
+        }
+
+
+
+        ChatUI chatUI = new ChatUI(checkboxList, musicPlayer);
         chatUI.startReaderThread();
 
         backgroundPane.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
@@ -47,6 +48,11 @@ public class BeatBox {
         controlPane.add(BorderLayout.CENTER, chatUI.getScrollerPane());
         controlPane.add(BorderLayout.SOUTH, chatUI.getCommentPane());
 
+        String[] instrumentNames = {"Bass Drum", "Closed Hi-Hat", "Open Hi-Hat", "Acoustic Snare", "Crash Cymbal",
+                "Hand Clap", "High Tom", "Hi Bongo", "Maracas", "Whistle", "Low Conga", "Cowbell", "Vibraslap",
+                "Low-mid Tom", "High Agogo", "Open Hi Conga"};
+
+        Box nameBox = new Box(BoxLayout.Y_AXIS);
         for (String inst : instrumentNames) {
             nameBox.add(new Label(inst));
         }
@@ -55,15 +61,7 @@ public class BeatBox {
         backgroundPane.add(BorderLayout.WEST, nameBox);
         backgroundPane.add(BorderLayout.CENTER, mainPanel);
 
-        grid.setVgap(1);
-        grid.setHgap(2);
 
-        for (int i = 0; i< 256; i++){
-            JCheckBox c = new JCheckBox();
-            c.setSelected(false);
-            checkboxList.add(c);
-            mainPanel.add(c);
-        }
 
         JFrame theFrame = new JFrame("Cyber BeatBox");
         theFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
