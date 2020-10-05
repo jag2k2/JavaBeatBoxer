@@ -16,8 +16,7 @@ public class BeatBox {
 
     private final JFrame theFrame;
     private final ArrayList<JCheckBox> checkboxList;
-    private final JButton serializeIt;
-    private final JButton restoreIt;
+    private final BeatPatternConverter beatPatternConverter;
     private final JButton sendComment;
     private final JTextField comment;
     private final DefaultListModel<String> discussionElements;
@@ -38,9 +37,8 @@ public class BeatBox {
     public BeatBox() {
         theFrame = new JFrame("Cyber BeatBox");
         checkboxList = new ArrayList<>();
+        beatPatternConverter = new BeatPatternConverter(checkboxList);
         musicPlayer = new MusicPlayer();
-        serializeIt = new JButton("Save");
-        restoreIt = new JButton("Restore");
         sendComment = new JButton("Send");
         comment = new JTextField("Your comment", 20);
         discussionElements = new DefaultListModel<>();
@@ -58,8 +56,7 @@ public class BeatBox {
     }
 
     public void addListeners() {
-        serializeIt.addActionListener(new MySerialListener());
-        restoreIt.addActionListener(new MyRestoreListener());
+
         sendComment.addActionListener(new MySendListener());
         discussion.addListSelectionListener(new MySelectionListener());
     }
@@ -82,50 +79,13 @@ public class BeatBox {
         }
     }
 
-    public class MySerialListener implements ActionListener {
-        public void actionPerformed(ActionEvent e) {
-            try{
-                FileOutputStream fileStream = new FileOutputStream(new File("Checkbox.ser"));
-                ObjectOutputStream os = new ObjectOutputStream(fileStream);
-                os.writeObject(flattenBeatPattern());
-            } catch (Exception ex) {ex.printStackTrace();}
-        }
-    }
-
-    public class MyRestoreListener implements ActionListener {
-        public void actionPerformed(ActionEvent e) {
-            try {
-                FileInputStream fileIn = new FileInputStream(new File("Checkbox.ser"));
-                ObjectInputStream is = new ObjectInputStream(fileIn);
-                displayBeatPattern((ArrayList<Boolean>) is.readObject());
-            } catch (Exception ex) {ex.printStackTrace();}
-        }
-    }
-
     public class MySendListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             try {
                 writer.writeObject(comment.getText());
-                writer.writeObject(flattenBeatPattern());
+                writer.writeObject(beatPatternConverter.flattenBeatPattern());
                 writer.flush();
             } catch (Exception ex) {ex.printStackTrace();}
-        }
-    }
-
-    public ArrayList<Boolean> flattenBeatPattern(){
-        ArrayList<Boolean> checkboxState = new ArrayList<>();
-        for (int i = 0; i < 256; i++) {
-            JCheckBox check = checkboxList.get(i);
-            checkboxState.add(check.isSelected());
-        }
-        return checkboxState;
-    }
-
-    public void displayBeatPattern(ArrayList<Boolean> checkBoxState) {
-        musicPlayer.stop();
-        for (int i = 0; i < 256; i++) {
-            JCheckBox check = checkboxList.get(i);
-            check.setSelected(checkBoxState.get(i));
         }
     }
 
@@ -133,14 +93,13 @@ public class BeatBox {
         public void valueChanged(ListSelectionEvent e) {
             if(e.getValueIsAdjusting()){
                 System.out.println(discussion.getSelectedIndex());
-                displayBeatPattern(patternStore.get(discussion.getSelectedIndex()));
+                beatPatternConverter.displayBeatPattern(patternStore.get(discussion.getSelectedIndex()));
             }
         }
     }
 
     public void buildGUI() {
         Box nameBox = new Box(BoxLayout.Y_AXIS);
-        Box saveBox = new Box(BoxLayout.Y_AXIS);
         Box buttonBox = new Box(BoxLayout.X_AXIS);
         BorderLayout backgroundLayout = new BorderLayout();
         JPanel backgroundPane = new JPanel(backgroundLayout);
@@ -152,15 +111,13 @@ public class BeatBox {
         JPanel mainPanel = new JPanel(grid);
         JScrollPane dScroller = new JScrollPane(discussion);
         MusicPlayerControlUI musicPlayerControlUI = new MusicPlayerControlUI(checkboxList, musicPlayer);
+        FileStorageUI fileStorageUI = new FileStorageUI(checkboxList);
 
         theFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         backgroundPane.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 
-
-        saveBox.add(serializeIt);
-        saveBox.add(restoreIt);
         buttonBox.add(musicPlayerControlUI.getBox());
-        buttonBox.add(saveBox);
+        buttonBox.add(fileStorageUI.getBox());
 
         dScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         dScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
