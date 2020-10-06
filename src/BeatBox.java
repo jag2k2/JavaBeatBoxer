@@ -10,6 +10,7 @@ public class BeatBox {
 
     public void buildGUI() {
         CheckBoxGrid checkBoxGrid = new CheckBoxGrid();
+        CheckBoxGridUI checkBoxGridUI = new CheckBoxGridUI(checkBoxGrid);
         MusicPlayer musicPlayer = new MusicPlayer();
         MusicPlayerControlUI musicPlayerControlUI = new MusicPlayerControlUI(checkBoxGrid, musicPlayer);
         FileStorageUI fileStorageUI = new FileStorageUI(checkBoxGrid, musicPlayer);
@@ -27,21 +28,12 @@ public class BeatBox {
         controlPane.add(BorderLayout.CENTER, chatUI.getScrollerPane());
         controlPane.add(BorderLayout.SOUTH, chatUI.getCommentPane());
 
-        String[] instrumentNames = {"Bass Drum", "Closed Hi-Hat", "Open Hi-Hat", "Acoustic Snare", "Crash Cymbal",
-                "Hand Clap", "High Tom", "Hi Bongo", "Maracas", "Whistle", "Low Conga", "Cowbell", "Vibraslap",
-                "Low-mid Tom", "High Agogo", "Open Hi Conga"};
-
-        Box nameBox = new Box(BoxLayout.Y_AXIS);
-        for (String inst : instrumentNames) {
-            nameBox.add(new Label(inst));
-        }
-
         BorderLayout backgroundLayout = new BorderLayout();
         JPanel backgroundPane = new JPanel(backgroundLayout);
         backgroundPane.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
         backgroundPane.add(BorderLayout.EAST, controlPane);
-        backgroundPane.add(BorderLayout.WEST, nameBox);
-        backgroundPane.add(BorderLayout.CENTER, checkBoxGrid.getGridPane());
+        //backgroundPane.add(BorderLayout.WEST, nameBox);
+        backgroundPane.add(BorderLayout.CENTER, checkBoxGridUI.getPanel());
 
         JFrame theFrame = new JFrame("Cyber BeatBox");
         theFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

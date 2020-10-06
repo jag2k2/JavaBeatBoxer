@@ -21,7 +21,7 @@ public class CheckBoxGrid {
         }
     }
 
-    public JPanel getGridPane() {
+    public JPanel getPanel() {
         return gridPane;
     }
 
