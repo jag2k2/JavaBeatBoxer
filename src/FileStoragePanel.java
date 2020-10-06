@@ -2,13 +2,13 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class FileStorageUI {
+public class FileStoragePanel {
     private final FileStorage fileStorage;
     private final CheckBoxGrid checkBoxGrid;
     private final MusicPlayer musicPlayer;
     private final Box buttonBox;
 
-    public FileStorageUI(CheckBoxGrid checkBoxGrid, MusicPlayer musicPlayer) {
+    public FileStoragePanel(CheckBoxGrid checkBoxGrid, MusicPlayer musicPlayer) {
         fileStorage = new FileStorage("Checkbox.ser");
         this.checkBoxGrid = checkBoxGrid;
         this.musicPlayer = musicPlayer;
@@ -27,13 +27,13 @@ public class FileStorageUI {
         return buttonBox;
     }
 
-    public class MySerialListener implements ActionListener {
+    class MySerialListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             fileStorage.saveToFile(checkBoxGrid.getData());
         }
     }
 
-    public class MyRestoreListener implements ActionListener {
+    class MyRestoreListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             musicPlayer.stop();
             checkBoxGrid.updateUI(fileStorage.readFromFile());

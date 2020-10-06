@@ -1,10 +1,10 @@
 import javax.swing.*;
 import java.awt.*;
 
-public class CheckBoxGridUI {
+public class CheckBoxGridPanel {
     private final JPanel panel;
 
-    public CheckBoxGridUI (CheckBoxGrid checkBoxGrid){
+    public CheckBoxGridPanel(CheckBoxGrid checkBoxGrid){
         String[] instrumentNames = {"Bass Drum", "Closed Hi-Hat", "Open Hi-Hat", "Acoustic Snare", "Crash Cymbal",
                 "Hand Clap", "High Tom", "Hi Bongo", "Maracas", "Whistle", "Low Conga", "Cowbell", "Vibraslap",
                 "Low-mid Tom", "High Agogo", "Open Hi Conga"};
