@@ -39,5 +39,4 @@ public class FileStoragePanel {
             checkBoxGrid.updateUI(fileStorage.readFromFile());
         }
     }
-
 }
