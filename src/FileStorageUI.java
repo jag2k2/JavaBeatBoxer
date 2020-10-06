@@ -1,17 +1,16 @@
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 
 public class FileStorageUI {
     private final FileStorage fileStorage;
-    private final BeatPatternConverter beatPatternConverter;
+    private final CheckBoxGrid checkBoxGrid;
     private final MusicPlayer musicPlayer;
     private final Box buttonBox;
 
-    public FileStorageUI(ArrayList<JCheckBox> userPatternSelection, MusicPlayer musicPlayer) {
+    public FileStorageUI(CheckBoxGrid checkBoxGrid, MusicPlayer musicPlayer) {
         fileStorage = new FileStorage("Checkbox.ser");
-        beatPatternConverter = new BeatPatternConverter(userPatternSelection);
+        this.checkBoxGrid = checkBoxGrid;
         this.musicPlayer = musicPlayer;
         buttonBox = new Box(BoxLayout.X_AXIS);
 
@@ -30,14 +29,14 @@ public class FileStorageUI {
 
     public class MySerialListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            fileStorage.saveToFile(beatPatternConverter.flattenBeatPattern());
+            fileStorage.saveToFile(checkBoxGrid.getData());
         }
     }
 
     public class MyRestoreListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             musicPlayer.stop();
-            beatPatternConverter.displayBeatPattern(fileStorage.readFromFile());
+            checkBoxGrid.updateUI(fileStorage.readFromFile());
         }
     }
 

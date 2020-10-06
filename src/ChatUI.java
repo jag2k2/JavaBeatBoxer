@@ -5,8 +5,8 @@ import java.awt.event.*;
 import java.util.ArrayList;
 
 public class ChatUI {
-    private final ServerCommunication serverCommunication;
-    private final BeatPatternConverter beatPatternConverter;
+    private final ChatCommunication serverCommunication;
+    private final CheckBoxGrid checkBoxGrid;
     private final ArrayList<ArrayList<Boolean>> patternStore;
     private final MusicPlayer musicPlayer;
     private final JTextField comment;
@@ -15,9 +15,9 @@ public class ChatUI {
     private final JScrollPane dScroller;
     private final JPanel commentPane;
 
-    public ChatUI(ArrayList<JCheckBox> userPatternSelection, MusicPlayer musicPlayer) {
-        serverCommunication = new ServerCommunication(userPatternSelection);
-        beatPatternConverter = new BeatPatternConverter(userPatternSelection);
+    public ChatUI(CheckBoxGrid checkBoxGrid, MusicPlayer musicPlayer) {
+        serverCommunication = new ChatCommunication();
+        this.checkBoxGrid = checkBoxGrid;
         this.patternStore = new ArrayList<>();
         this.musicPlayer = musicPlayer;
 
@@ -51,7 +51,7 @@ public class ChatUI {
 
     public class UserMakesCommentListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            serverCommunication.sendCurrentPatternWithComment(comment.getText());
+            serverCommunication.sendPattern(comment.getText(), checkBoxGrid);
         }
     }
 
@@ -60,7 +60,7 @@ public class ChatUI {
             if (e.getValueIsAdjusting()) {
                 musicPlayer.stop();
                 System.out.println(discussion.getSelectedIndex());
-                beatPatternConverter.displayBeatPattern(patternStore.get(discussion.getSelectedIndex()));
+                checkBoxGrid.updateUI(patternStore.get(discussion.getSelectedIndex()));
             }
         }
     }
@@ -74,9 +74,9 @@ public class ChatUI {
         public void run() {
             String message;
             try {
-                while ((message = serverCommunication.getIncomingComment()) != null) {
+                while ((message = serverCommunication.readIncomingComment()) != null) {
                     discussionElements.addElement(message);
-                    patternStore.add(serverCommunication.getIncomingPattern());
+                    patternStore.add(serverCommunication.readIncomingPattern());
                     System.out.println("Read: " + message);
                 }
             } catch (Exception ex) {

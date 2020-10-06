@@ -3,13 +3,11 @@ import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 
-public class ServerCommunication {
+public class ChatCommunication {
     private ObjectInputStream reader;
     private ObjectOutputStream writer;
-    private final BeatPatternConverter beatPatternConverter;
 
-    public ServerCommunication(ArrayList<JCheckBox> userBeatPattern) {
-        beatPatternConverter = new BeatPatternConverter(userBeatPattern);
+    public ChatCommunication() {
         try {
             Socket sock = new Socket("127.0.0.1", 4242);
             reader = new ObjectInputStream(sock.getInputStream());
@@ -18,15 +16,15 @@ public class ServerCommunication {
         } catch (IOException ex) {ex.printStackTrace();}
     }
 
-    public void sendCurrentPatternWithComment(String comment){
+    public void sendPattern(String comment, CheckBoxGrid checkBoxGrid){
         try {
             writer.writeObject(comment);
-            writer.writeObject(beatPatternConverter.flattenBeatPattern());
+            writer.writeObject(checkBoxGrid.getData());
             writer.flush();
         } catch (Exception ex) {ex.printStackTrace();}
     }
 
-    public String getIncomingComment() {
+    public String readIncomingComment() {
         String message = null;
         try {
             message = (String) reader.readObject();
@@ -34,7 +32,7 @@ public class ServerCommunication {
         return message;
     }
 
-    public ArrayList<Boolean> getIncomingPattern() {
+    public ArrayList<Boolean> readIncomingPattern() {
         ArrayList<Boolean> pattern = new ArrayList<>();
         try {
             pattern = (ArrayList<Boolean>) reader.readObject();

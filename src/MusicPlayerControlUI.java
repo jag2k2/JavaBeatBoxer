@@ -8,10 +8,10 @@ public class MusicPlayerControlUI {
     private static final int[] instruments = {35,42,46,38,49,39,50,60,70,72,64,56,58,47,67,63};
     private final Box buttonBox;
     private final MusicPlayer musicPlayer;
-    private final ArrayList<JCheckBox> userBeatSelections;
+    private final CheckBoxGrid checkBoxGrid;
 
-    public MusicPlayerControlUI(ArrayList<JCheckBox> userBeatSelections, MusicPlayer musicPlayer) {
-        this.userBeatSelections = userBeatSelections;
+    public MusicPlayerControlUI(CheckBoxGrid checkBoxGrid, MusicPlayer musicPlayer) {
+        this.checkBoxGrid = checkBoxGrid;
         this.musicPlayer = musicPlayer;
 
         JButton start = new JButton("Start");
@@ -45,12 +45,13 @@ public class MusicPlayerControlUI {
     private Sequence buildSequence() {
         Sequence seq = null;
         try {
+            ArrayList<Boolean> userSelections = checkBoxGrid.getData();
             seq = new Sequence(Sequence.PPQ, 4);
             Track track = seq.createTrack();
             for (int i = 0; i < 16; i++) {
                 for (int j = 0; j < 16; j++) {
-                    JCheckBox jc = userBeatSelections.get(j + 16 * i);
-                    if (jc.isSelected()) {
+                    Boolean selection = userSelections.get(j + 16 * i);
+                    if (selection) {
                         track.add(makeEvent(144,9,instruments[i], 100, j));
                         track.add(makeEvent(128,9,instruments[i], 100, j+1));
                     }

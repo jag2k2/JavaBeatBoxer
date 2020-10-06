@@ -1,6 +1,5 @@
 import java.awt.*;
 import javax.swing.*;
-import java.util.*;
 
 public class BeatBox {
 
@@ -10,33 +9,13 @@ public class BeatBox {
     }
 
     public void buildGUI() {
-        ArrayList<JCheckBox> checkboxList = new ArrayList<>();
+        CheckBoxGrid checkBoxGrid = new CheckBoxGrid();
         MusicPlayer musicPlayer = new MusicPlayer();
+        MusicPlayerControlUI musicPlayerControlUI = new MusicPlayerControlUI(checkBoxGrid, musicPlayer);
+        FileStorageUI fileStorageUI = new FileStorageUI(checkBoxGrid, musicPlayer);
 
-        MusicPlayerControlUI musicPlayerControlUI = new MusicPlayerControlUI(checkboxList, musicPlayer);
-        FileStorageUI fileStorageUI = new FileStorageUI(checkboxList, musicPlayer);
-
-        BorderLayout backgroundLayout = new BorderLayout();
-        JPanel backgroundPane = new JPanel(backgroundLayout);
-
-        GridLayout grid = new GridLayout(16, 16);
-        grid.setVgap(1);
-        grid.setHgap(2);
-
-        JPanel mainPanel = new JPanel(grid);
-        for (int i = 0; i< 256; i++){
-            JCheckBox c = new JCheckBox();
-            c.setSelected(false);
-            checkboxList.add(c);
-            mainPanel.add(c);
-        }
-
-
-
-        ChatUI chatUI = new ChatUI(checkboxList, musicPlayer);
+        ChatUI chatUI = new ChatUI(checkBoxGrid, musicPlayer);
         chatUI.startReaderThread();
-
-        backgroundPane.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 
         Box buttonBox = new Box(BoxLayout.X_AXIS);
         buttonBox.add(musicPlayerControlUI.getBox());
@@ -57,11 +36,12 @@ public class BeatBox {
             nameBox.add(new Label(inst));
         }
 
+        BorderLayout backgroundLayout = new BorderLayout();
+        JPanel backgroundPane = new JPanel(backgroundLayout);
+        backgroundPane.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
         backgroundPane.add(BorderLayout.EAST, controlPane);
         backgroundPane.add(BorderLayout.WEST, nameBox);
-        backgroundPane.add(BorderLayout.CENTER, mainPanel);
-
-
+        backgroundPane.add(BorderLayout.CENTER, checkBoxGrid.getGridPane());
 
         JFrame theFrame = new JFrame("Cyber BeatBox");
         theFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
